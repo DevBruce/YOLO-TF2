@@ -42,6 +42,7 @@ def main(argv):
     global logger, tb_train_writer, tb_val_writer, train_viz_batch_data, val_viz_batch_data
     global yolo, optimizer
     global VOC2012_PB_PATH, ckpt, ckpt_manager
+    global total_current_step
 
     # Dataset (PascalVOC2012)
     voc2012 = GetVoc2012(batch_size=FLAGS.batch_size)
@@ -87,12 +88,12 @@ def main(argv):
     backbone_xception = get_xception_backbone(cfg=cfg, freeze=False)
     yolo = YOLO(backbone=backbone_xception, cfg=cfg)
 
-    # Optimizer (Default: 1e-4 for 75 epochs, 1e-5 for 30 epochs, 1e-6 for 30 epochs)
+    # Optimizer
     # Paper Page 4. We continue training with 1e-2 for 75 epochs, then 1e-3 for 30 epochs, and finally 1e-4 for 30 epochs.
     train_steps_per_epoch = len(voc2012.get_train_ds())
     lr_schedule = tf.keras.optimizers.schedules.PiecewiseConstantDecay(
-        boundaries=[train_steps_per_epoch * 75, train_steps_per_epoch * 30],
-        values=[FLAGS.init_lr, 1e-5, 1e-6],
+        boundaries=[train_steps_per_epoch * 20, train_steps_per_epoch * 45, train_steps_per_epoch * 20],
+        values=[FLAGS.init_lr, 1e-4, 1e-5, 1e-6],
     )
     optimizer = tf.optimizers.Adam(learning_rate=lr_schedule)
 
@@ -117,6 +118,7 @@ def main(argv):
     print(colored(latest_ckpt_log, 'magenta'))
 
     # Training
+    total_current_step = 0
     train()
 
     
@@ -129,8 +131,9 @@ def train():
         for step, batch_data in enumerate(train_ds, 1):
             batch_imgs, batch_labels = prep_voc_data(batch_data, input_height=cfg.input_height, input_width=cfg.input_width)
             losses = train_step(yolo, optimizer, batch_imgs, batch_labels, cfg)
-            lr = optimizer.lr(optimizer.iterations).numpy()
+            lr = optimizer.lr(total_current_step).numpy()
             train_log_handler.logging(epoch=epoch, step=step, losses=losses, lr=lr, tb_writer=tb_train_writer)
+            total_current_step += 1
 
         if epoch % FLAGS.val_step == 0:
             validation(epoch=epoch)
