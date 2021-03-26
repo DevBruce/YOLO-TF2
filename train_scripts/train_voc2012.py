@@ -42,7 +42,6 @@ def main(argv):
     global logger, tb_train_writer, tb_val_writer, train_viz_batch_data, val_viz_batch_data
     global yolo, optimizer
     global VOC2012_PB_PATH, ckpt, ckpt_manager
-    global total_current_step
 
     # Dataset (PascalVOC2012)
     voc2012 = GetVoc2012(batch_size=FLAGS.batch_size)
@@ -118,7 +117,6 @@ def main(argv):
     print(colored(latest_ckpt_log, 'magenta'))
 
     # Training
-    total_current_step = 0
     train()
 
     
@@ -131,19 +129,12 @@ def train():
         for step, batch_data in enumerate(train_ds, 1):
             batch_imgs, batch_labels = prep_voc_data(batch_data, input_height=cfg.input_height, input_width=cfg.input_width)
             losses = train_step(yolo, optimizer, batch_imgs, batch_labels, cfg)
-            lr = optimizer.lr(total_current_step).numpy()
+            # lr = optimizer.lr(total_current_step).numpy()
             train_log_handler.logging(epoch=epoch, step=step, losses=losses, lr=lr, tb_writer=tb_train_writer)
             total_current_step += 1
 
         if epoch % FLAGS.val_step == 0:
             validation(epoch=epoch)
-    
-    yolo.save(filepath=VOC2012_PB_PATH, save_format='tf')
-    pb_save_log = '\n' + '=' * 60 + '\n'
-    pb_save_log += f'* Training Completed and Save pb file [{VOC2012_PB_PATH}]'
-    pb_save_log += '\n' + '=' * 60 + '\n'
-    logger.info(pb_save_log)
-    print(colored(pb_save_log, 'green'))
     
     
 def validation(epoch):
@@ -251,15 +242,16 @@ def validation(epoch):
     )
     # ========= ================================================ =========
 
-    # Save Checkpoint
+    # Save checkpoint and pb
     if APs['mAP'] >= mAP_prev:
         ckpt_manager.save(checkpoint_number=ckpt.step)
+        yolo.save(filepath=VOC2012_PB_PATH, save_format='tf')
         mAP_prev = APs['mAP']
         ckpt_log = '\n' + '=' * 60 + '\n'
-        ckpt_log += '* Save checkpoint file'
+        ckpt_log += f'* Save checkpoint file and pb file [{VOC2012_PB_PATH}]'
         ckpt_log += '\n' + '=' * 60 + '\n'
         logger.info(ckpt_log)
-        print(colored(ckpt_log, 'magenta'))
+        print(colored(ckpt_log, 'green'))
     ckpt.step.assign_add(1)
 
 
