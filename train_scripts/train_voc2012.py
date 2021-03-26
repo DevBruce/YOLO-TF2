@@ -93,8 +93,8 @@ def main(argv):
     # Paper Page 4. We continue training with 1e-2 for 75 epochs, then 1e-3 for 30 epochs, and finally 1e-4 for 30 epochs.
     train_steps_per_epoch = len(voc2012.get_train_ds())
     lr_schedule = tf.keras.optimizers.schedules.PiecewiseConstantDecay(
-        boundaries=[train_steps_per_epoch * 20, train_steps_per_epoch * 45, train_steps_per_epoch * 20],
-        values=[FLAGS.init_lr, 1e-4, 1e-5, 1e-6],
+        boundaries=[train_steps_per_epoch * 65, train_steps_per_epoch * 25],
+        values=[FLAGS.init_lr, 1e-5, 1e-6],
     )
     optimizer = tf.optimizers.Adam(learning_rate=lr_schedule)
 
