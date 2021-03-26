@@ -42,6 +42,7 @@ def main(argv):
     global logger, tb_train_writer, tb_val_writer, train_viz_batch_data, val_viz_batch_data
     global yolo, optimizer
     global VOC2012_PB_PATH, ckpt, ckpt_manager
+    global val_metrics
 
     # Dataset (PascalVOC2012)
     voc2012 = GetVoc2012(batch_size=FLAGS.batch_size)
@@ -97,7 +98,6 @@ def main(argv):
     optimizer = tf.optimizers.Adam(learning_rate=lr_schedule)
 
     # Checkpoint
-    VOC2012_PB_PATH = os.path.join(ProjectPath.VOC2012_CKPTS_DIR.value, f'yolo_epoch_{FLAGS.epochs}.pb')
     ckpt = tf.train.Checkpoint(step=tf.Variable(0), model=yolo)
     ckpt_manager = tf.train.CheckpointManager(
         ckpt,
@@ -116,6 +116,9 @@ def main(argv):
     logger.info(latest_ckpt_log)
     print(colored(latest_ckpt_log, 'magenta'))
 
+    # Val Metrics
+    val_metrics = {'mAP_best': 0.}
+
     # Training
     train()
 
@@ -129,18 +132,13 @@ def train():
         for step, batch_data in enumerate(train_ds, 1):
             batch_imgs, batch_labels = prep_voc_data(batch_data, input_height=cfg.input_height, input_width=cfg.input_width)
             losses = train_step(yolo, optimizer, batch_imgs, batch_labels, cfg)
-            # lr = optimizer.lr(total_current_step).numpy()
-            train_log_handler.logging(epoch=epoch, step=step, losses=losses, lr=lr, tb_writer=tb_train_writer)
-            total_current_step += 1
+            train_log_handler.logging(epoch=epoch, step=step, losses=losses, tb_writer=tb_train_writer)
 
         if epoch % FLAGS.val_step == 0:
             validation(epoch=epoch)
     
     
 def validation(epoch):
-    global mAP_prev
-    mAP_prev = 0
-    
     if FLAGS.val_sample_num:
         val_ds = voc2012.get_val_ds().take(FLAGS.val_sample_num)
     else:
@@ -243,10 +241,11 @@ def validation(epoch):
     # ========= ================================================ =========
 
     # Save checkpoint and pb
-    if APs['mAP'] >= mAP_prev:
+    VOC2012_PB_PATH = os.path.join(ProjectPath.VOC2012_CKPTS_DIR.value, f'yolo_voc2012_{cfg.input_height}x{cfg.input_width}.pb')
+    if APs['mAP'] >= val_metrics['mAP_best']:
         ckpt_manager.save(checkpoint_number=ckpt.step)
         yolo.save(filepath=VOC2012_PB_PATH, save_format='tf')
-        mAP_prev = APs['mAP']
+        val_metrics['mAP_best'] = APs['mAP']
         ckpt_log = '\n' + '=' * 60 + '\n'
         ckpt_log += f'* Save checkpoint file and pb file [{VOC2012_PB_PATH}]'
         ckpt_log += '\n' + '=' * 60 + '\n'

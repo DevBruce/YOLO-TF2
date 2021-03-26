@@ -13,9 +13,9 @@ class TrainLogHandler:
         self.optimizer = optimizer
         self.logger = logger
 
-    def logging(self, epoch, step, losses, lr, tb_writer):
+    def logging(self, epoch, step, losses, tb_writer):
         self._console_logs(epoch=epoch, step=step, losses=losses)
-        self._tb_logs(tb_writer=tb_writer, losses=losses, lr=lr)
+        self._tb_logs(tb_writer=tb_writer, losses=losses)
 
     def _console_logs(self, epoch, step, losses):
         log, log_colored = train_step_console_log(
@@ -28,9 +28,11 @@ class TrainLogHandler:
         self.logger.info(log)
         print(log_colored)
 
-    def _tb_logs(self, tb_writer, losses, lr):
-        tb_write_losses(tb_writer, losses, step=self.optimizer.iterations)
-        tb_write_lr(tb_writer, lr, step=self.optimizer.iterations)
+    def _tb_logs(self, tb_writer, losses):
+        current_iteration = self.optimizer.iterations.numpy()
+        lr = self.optimizer.lr(current_iteration).numpy()
+        tb_write_losses(tb_writer, losses, step=current_iteration)
+        tb_write_lr(tb_writer, lr, step=current_iteration)
 
 
 class ValLogHandler:
