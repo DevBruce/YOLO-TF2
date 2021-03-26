@@ -35,6 +35,7 @@ flags.DEFINE_integer('val_sample_num', default=0, help='Validation sampling. 0 m
 # Save some gpu errors
 physical_devices = tf.config.list_physical_devices('GPU')
 tf.config.experimental.set_memory_growth(device=physical_devices[0], enable=True)
+VOC2012_PB_PATH = os.path.join(ProjectPath.VOC2012_CKPTS_DIR.value, f'yolo_voc2012_{cfg.input_height}x{cfg.input_width}.pb')
     
 
 def main(argv):
@@ -241,14 +242,13 @@ def validation(epoch):
     # ========= ================================================ =========
 
     # Save checkpoint and pb
-    VOC2012_PB_PATH = os.path.join(ProjectPath.VOC2012_CKPTS_DIR.value, f'yolo_voc2012_{cfg.input_height}x{cfg.input_width}.pb')
     if APs['mAP'] >= val_metrics['mAP_best']:
         ckpt_manager.save(checkpoint_number=ckpt.step)
         yolo.save(filepath=VOC2012_PB_PATH, save_format='tf')
         val_metrics['mAP_best'] = APs['mAP']
-        ckpt_log = '\n' + '=' * 60 + '\n'
+        ckpt_log = '\n' + '=' * 100 + '\n'
         ckpt_log += f'* Save checkpoint file and pb file [{VOC2012_PB_PATH}]'
-        ckpt_log += '\n' + '=' * 60 + '\n'
+        ckpt_log += '\n' + '=' * 100 + '\n'
         logger.info(ckpt_log)
         print(colored(ckpt_log, 'green'))
     ckpt.step.assign_add(1)
