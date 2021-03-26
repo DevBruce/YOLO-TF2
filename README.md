@@ -22,11 +22,7 @@ So there is a no Dropout layer for regularization.
 
 ## Preview
 
-### Prediction Visualization
-
-<br>
-
-### Tensorboard
+Will be updated soon . . .
 
 <br><br>
 
