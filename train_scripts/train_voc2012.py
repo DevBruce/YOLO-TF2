@@ -25,6 +25,8 @@ from configs import cfg, ProjectPath
 FLAGS = flags.FLAGS
 flags.DEFINE_integer('epochs', default=cfg.epochs, help='Number of training epochs')
 flags.DEFINE_float('init_lr', default=cfg.init_lr, help='Initial learning rate')
+flags.DEFINE_float('lr_decay_rate', default=0.5, help='Learning rate decay rate')
+flags.DEFINE_integer('lr_decay_steps', default=10000, help='Learning rate decay steps')
 flags.DEFINE_integer('batch_size', default=cfg.batch_size, help='Batch size')
 flags.DEFINE_integer('val_step', default=cfg.val_step, help='Validation interval during training')
 flags.DEFINE_integer('tb_img_max_outputs', default=cfg.tb_img_max_outputs, help='Number of visualized prediction images in tensorboard')
@@ -91,10 +93,11 @@ def main(argv):
 
     # Optimizer
     # Paper Page 4. We continue training with 1e-2 for 75 epochs, then 1e-3 for 30 epochs, and finally 1e-4 for 30 epochs.
-    train_steps_per_epoch = len(voc2012.get_train_ds())
-    lr_schedule = tf.keras.optimizers.schedules.PiecewiseConstantDecay(
-        boundaries=[train_steps_per_epoch * 65, train_steps_per_epoch * 25],
-        values=[FLAGS.init_lr, 1e-5, 1e-6],
+    lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+        initial_learning_rate=FLAGS.init_lr,
+        decay_steps=FLAGS.lr_decay_steps,
+        decay_rate=FLAGS.lr_decay_rate,
+        staircase=True,
     )
     optimizer = tf.optimizers.Adam(learning_rate=lr_schedule)
 
