@@ -5,12 +5,13 @@
 For ease of implementation, i have not implemented exactly the same as paper.  
 The things presented below are implemented differently from the paper.
 
-- Backbone network. (I used Xception instead of network mentioned in paper.)
+- Backbone network. (I used **Xception** instead of network mentioned in paper.)
 
-- I used Global Average Pooling instead of Fully Connected Layer.  
+- I used **Global Average Pooling** instead of Fully Connected Layer.  
 So there is a no Dropout layer for regularization.
 
-- Learning Rate Schedule
+- Learning Rate Schedule  
+(I used `tf.keras.optimizers.schedules.ExponentialDecay`)
 
 - Hyper Parameters
 
@@ -42,9 +43,9 @@ $ docker run -d -it --gpus all --shm-size=${PROPER_VALUE} ${NAME}:${TAG} /bin/ba
 
 <br><br>
 
-## Support Dataset to Training
+## Training
 
-- **PascalVOC 2012** with [TFDS](https://www.tensorflow.org/datasets/overview) (Training Script: [train_voc2012.py](./train_scripts/train_voc2012.py))
+- **PascalVOC 2012** with [TFDS](https://www.tensorflow.org/datasets/overview) (Training Script: [./train_scripts/train_voc2012.py](./train_scripts/train_voc2012.py))
 
 ```bash
 $ python train_voc2012.py
@@ -52,12 +53,14 @@ $ python train_voc2012.py
 
 **Options**  
 
-Default option value is [configs.py](./configs/configs.py).  
-If the option is given, the default config value is overridden.  
+Default option values are [./configs/configs.py](./configs/configs.py).  
+If the options are given, the default config values are overridden.  
 
 - `--epochs`: Number of training epochs
 - `--init_lr`: Initial learning rate
-- `--batch_size`
+- `--lr_decay_rate`: Learning rate decay rate
+- `--lr_decay_steps`: Learning rate decay steps
+- `--batch_size`: Training batch size
 - `--val_step`: Validation interval during training
 - `--tb_img_max_outputs `: Number of visualized prediction images in tensorboard
 - `--val_sample_num`: Validation sampling. 0 means use all validation set.

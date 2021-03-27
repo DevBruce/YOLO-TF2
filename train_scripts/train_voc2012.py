@@ -25,12 +25,12 @@ from configs import cfg, ProjectPath
 FLAGS = flags.FLAGS
 flags.DEFINE_integer('epochs', default=cfg.epochs, help='Number of training epochs')
 flags.DEFINE_float('init_lr', default=cfg.init_lr, help='Initial learning rate')
-flags.DEFINE_float('lr_decay_rate', default=0.5, help='Learning rate decay rate')
-flags.DEFINE_integer('lr_decay_steps', default=10000, help='Learning rate decay steps')
+flags.DEFINE_float('lr_decay_rate', default=cfg.lr_decay_rate, help='Learning rate decay rate')
+flags.DEFINE_integer('lr_decay_steps', default=cfg.lr_decay_steps, help='Learning rate decay steps')
 flags.DEFINE_integer('batch_size', default=cfg.batch_size, help='Batch size')
 flags.DEFINE_integer('val_step', default=cfg.val_step, help='Validation interval during training')
 flags.DEFINE_integer('tb_img_max_outputs', default=cfg.tb_img_max_outputs, help='Number of visualized prediction images in tensorboard')
-flags.DEFINE_integer('val_sample_num', default=0, help='Validation sampling. 0 means use all validation set')
+flags.DEFINE_integer('val_sample_num', default=cfg.val_sample_num, help='Validation sampling. 0 means use all validation set')
 # flags.mark_flag_as_required('')
 
 
