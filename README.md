@@ -5,10 +5,7 @@
 For ease of implementation, i have not implemented exactly the same as paper.  
 The things presented below are implemented differently from the paper.
 
-- Backbone network. (I used **Xception** instead of network mentioned in paper.)
-
-- I used **Global Average Pooling** instead of Fully Connected Layer.  
-So there is a no Dropout layer for regularization.
+- Backbone network. (I used **Xception** instead of network mentioned in the paper.)
 
 - Learning Rate Schedule  
 (I used `tf.keras.optimizers.schedules.ExponentialDecay`)
