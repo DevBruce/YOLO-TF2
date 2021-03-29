@@ -76,6 +76,7 @@ If the options are given, the default config values are overridden.
 - `--batch_size`: Training batch size
 - `--val_step`: Validation interval during training
 - `--tb_img_max_outputs `: Number of visualized prediction images in tensorboard
+- `--train_ds_sample_ratio`: Training dataset sampling ratio
 - `--val_sample_num`: Validation sampling. 0 means use all validation set.
 
 <br>

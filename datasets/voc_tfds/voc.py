@@ -12,7 +12,7 @@ class GetVoc:
         self.batch_size = batch_size
         self.autotune = tf.data.experimental.AUTOTUNE
 
-    def get_train_ds(self, shuffle=True, drop_remainder=True):
+    def get_train_ds(self, shuffle=True, drop_remainder=True, sample_ratio=1):
         # Training Dataset (voc2007 trainval + 2012 trainval)
         (voc2007_train, voc2007_val), voc2007_info = tfds.load(name='voc/2007', split=['train', 'validation'], with_info=True)
         (voc2012_train, voc2012_val), voc2012_info = tfds.load(name='voc/2012', split=['train', 'validation'], with_info=True)
@@ -24,6 +24,8 @@ class GetVoc:
 
         if shuffle:
             train_ds = train_ds.shuffle(train_ds_num_examples)
+        if sample_ratio != 1:
+            train_ds = train_ds.take(int(train_ds_num_examples * sample_ratio))
         
         train_ds = train_ds.map(normalize_img, num_parallel_calls=self.autotune)
         train_ds = train_ds.map(flip_lr, num_parallel_calls=self.autotune)

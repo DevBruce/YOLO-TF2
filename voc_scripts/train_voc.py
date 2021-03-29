@@ -30,6 +30,7 @@ flags.DEFINE_integer('lr_decay_steps', default=cfg.lr_decay_steps, help='Learnin
 flags.DEFINE_integer('batch_size', default=cfg.batch_size, help='Batch size')
 flags.DEFINE_integer('val_step', default=cfg.val_step, help='Validation interval during training')
 flags.DEFINE_integer('tb_img_max_outputs', default=cfg.tb_img_max_outputs, help='Number of visualized prediction images in tensorboard')
+flags.DEFINE_integer('train_ds_sample_ratio', default=cfg.train_ds_sample_ratio, help='Training dataset sampling ratio')
 flags.DEFINE_integer('val_sample_num', default=cfg.val_sample_num, help='Validation sampling. 0 means use all validation set')
 # flags.mark_flag_as_required('')
 
@@ -129,7 +130,7 @@ def main(argv):
     
 def train():
     for epoch in range(1, FLAGS.epochs+1):
-        train_ds = voc.get_train_ds(shuffle=True, drop_remainder=True)
+        train_ds = voc.get_train_ds(shuffle=True, drop_remainder=True, sample_ratio=FLAGS.train_ds_sample_ratio)
         steps_per_epoch = len(train_ds)
         train_log_handler = TrainLogHandler(total_epochs=FLAGS.epochs, steps_per_epoch=steps_per_epoch, optimizer=optimizer, logger=logger)
 
