@@ -28,15 +28,20 @@ class GetVoc:
         train_ds = train_ds.map(normalize_img, num_parallel_calls=self.autotune)
         train_ds = train_ds.map(flip_lr, num_parallel_calls=self.autotune)
         train_ds = train_ds.map(color_augs, num_parallel_calls=self.autotune)
-        train_ds = train_ds.cache()  # Loaded data first time, it's going to keep track of some of them in memory. It makes faster
+        
+        # Loaded data first time, it's going to keep track of some of them in memory. It makes faster
+        # train_ds = train_ds.cache()
+        
         train_ds = train_ds.padded_batch(self.batch_size, drop_remainder=drop_remainder)
-        train_ds = train_ds.prefetch(self.autotune)  # While running on gpu, it's going to prefetch number of batch_size examples, so they are ready to be run instantly after the gpu calls are done
+        
+        # While running on gpu, it's going to prefetch number of batch_size examples, so they are ready to be run instantly after the gpu calls are done
+        # train_ds = train_ds.prefetch(self.autotune)  
         return train_ds
 
     def get_val_ds(self):
         (val_ds,) = tfds.load(name='voc/2007', split=['test'], with_info=False)
         val_ds = val_ds.map(normalize_img, num_parallel_calls=self.autotune)
         val_ds = val_ds.padded_batch(self.batch_size)
-        val_ds = val_ds.prefetch(self.autotune)
+        # val_ds = val_ds.prefetch(self.autotune)
         return val_ds
     
