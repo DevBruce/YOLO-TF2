@@ -18,7 +18,7 @@ def _mkdir_dirs(*dir_paths):
 _mkdir_dirs(
     ProjectPath.LOGS_DIR.value,
     ProjectPath.CKPTS_DIR.value,
-    ProjectPath.VOC2012_CKPTS_DIR.value,
+    ProjectPath.VOC_CKPTS_DIR.value,
     ProjectPath.CONSOLE_LOGS_DIR.value,
     ProjectPath.TB_LOGS_DIR.value,
     )
