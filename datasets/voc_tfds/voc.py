@@ -3,11 +3,11 @@ import tensorflow_datasets as tfds
 from .augs import normalize_img, flip_lr, color_augs
 
 
-__all__ = ['GetVoc2012']
+__all__ = ['GetVoc']
 
 
 # Reference: https://www.tensorflow.org/datasets/catalog/voc
-class GetVoc2012:
+class GetVoc:
     def __init__(self, batch_size):
         self.batch_size = batch_size
         self.autotune = tf.data.experimental.AUTOTUNE

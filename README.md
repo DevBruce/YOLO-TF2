@@ -40,12 +40,15 @@ $ docker run -d -it --gpus all --shm-size=${PROPER_VALUE} ${NAME}:${TAG} /bin/ba
 
 <br><br>
 
-## Training PascalVOC 2012 Dataset
+## Training PascalVOC Dataset
 
-- **PascalVOC 2012** with [TFDS](https://www.tensorflow.org/datasets/overview) (Training Script: [./voc2012_scripts/train_voc2012.py](./train_scripts/train_voc2012.py))
+- **PascalVOC Dataset** with [TFDS](https://www.tensorflow.org/datasets/overview) (Training Script: [./voc_scripts/train_voc.py](./voc_scripts/train_voc.py))
+
+- Training Set: PascalVOC2007 trainval + PascalVOC2012 trainval
+- Validation Set: PascalVOC2007 test
 
 ```bash
-$ python train_voc2012.py
+$ python train_voc.py
 ```
 
 **Options**  

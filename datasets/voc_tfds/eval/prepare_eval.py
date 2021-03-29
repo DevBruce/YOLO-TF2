@@ -2,7 +2,7 @@ import os
 import tqdm
 import pickle
 import numpy as np
-from datasets.voc2012_tfds.libs import prep_voc_data
+from datasets.voc_tfds.libs import prep_voc_data
 from configs import ProjectPath
 
 
@@ -49,7 +49,7 @@ def get_gts_all(ds, input_height, input_width, cls_map, full_save=False):
 
     # Save as pickle file
     if full_save:
-        voc2012_val_gts_all_path = os.path.join(ProjectPath.DATASETS_DIR.value, 'voc2012_tfds', 'eval', f'val_gts_all_448_full.pickle')
+        voc2012_val_gts_all_path = os.path.join(ProjectPath.DATASETS_DIR.value, 'voc_tfds', 'eval', f'val_gts_all_448_full.pickle')
         with open(voc2012_val_gts_all_path, 'wb') as f:
             pickle.dump(gts_all, f)
     

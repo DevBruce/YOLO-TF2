@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from datasets.voc2012_tfds.viz import viz_voc_prep
+from datasets.voc_tfds.viz import viz_voc_prep
 
 
 __all__ = ['tb_write_losses', 'tb_write_lr', 'tb_write_APs', 'tb_write_imgs', 'tb_write_sampled_voc_gt_imgs']

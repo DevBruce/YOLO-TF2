@@ -8,14 +8,14 @@ from termcolor import colored
 from absl import flags, app
 from pascalvoc_ap.ap import get_ap
 from libs.utils import yolo_output2boxes, box_postp2use
-from datasets.voc2012_tfds.voc2012 import GetVoc2012
-from datasets.voc2012_tfds.libs import prep_voc_data, VOC_CLS_MAP
+from datasets.voc_tfds.voc import GetVoc
+from datasets.voc_tfds.libs import prep_voc_data, VOC_CLS_MAP
 from configs import ProjectPath, cfg
 
 
 FLAGS = flags.FLAGS
 flags.DEFINE_integer('batch_size', default=cfg.batch_size, help='Batch size')
-flags.DEFINE_string('pb_dir', default=os.path.join(ProjectPath.VOC2012_CKPTS_DIR.value, 'yolo_voc2012_448x448'), help='Save pb directory path')
+flags.DEFINE_string('pb_dir', default=os.path.join(ProjectPath.VOC_CKPTS_DIR.value, 'yolo_voc_448x448'), help='Save pb directory path')
 
 
 def main(argv):
@@ -25,13 +25,13 @@ def main(argv):
         options=None,
     )
 
-    voc2012 = GetVoc2012(batch_size=FLAGS.batch_size)
-    voc2012_val_gts_all_path = os.path.join(ProjectPath.DATASETS_DIR.value, 'voc2012_tfds', 'eval', 'val_gts_all_448_full.pickle')
-    if os.path.exists(voc2012_val_gts_all_path):
-        voc2012_val_gts_all = pickle.load(open(voc2012_val_gts_all_path, 'rb'))
+    voc = GetVoc(batch_size=FLAGS.batch_size)
+    voc_val_gts_all_path = os.path.join(ProjectPath.DATASETS_DIR.value, 'voc_tfds', 'eval', 'val_gts_all_448_full.pickle')
+    if os.path.exists(voc_val_gts_all_path):
+        voc_val_gts_all = pickle.load(open(voc_val_gts_all_path, 'rb'))
         cls_name_list = list(VOC_CLS_MAP.values())
 
-    val_ds = voc2012.get_val_ds()
+    val_ds = voc.get_val_ds()
     img_id = 0
     val_preds_all = list()
 
@@ -50,7 +50,7 @@ def main(argv):
                 val_preds_all.append([cls_name, conf, *map(round, pts), img_id])
             img_id += 1
 
-    APs = get_ap(preds_all=val_preds_all, gts_all=voc2012_val_gts_all, classes=cls_name_list, iou_thr=0.5)
+    APs = get_ap(preds_all=val_preds_all, gts_all=voc_val_gts_all, classes=cls_name_list, iou_thr=0.5)
     mAP = APs.pop('mAP')
     APs_log = '\n====== mAP ======\n' + f'* mAP: {mAP:<8.4f}\n'
     for cls_name, ap in APs.items():

@@ -16,9 +16,9 @@ from libs.loggers import TrainLogHandler, ValLogHandler
 from libs.loggers.console_logs import get_logger
 from libs.loggers.tb_logs import tb_write_sampled_voc_gt_imgs, tb_write_imgs
 from libs.utils import yolo_output2boxes, box_postp2use, viz_pred
-from datasets.voc2012_tfds.voc2012 import GetVoc2012
-from datasets.voc2012_tfds.libs import prep_voc_data, VOC_CLS_MAP
-from datasets.voc2012_tfds.eval.prepare_eval import get_gts_all
+from datasets.voc_tfds.voc import GetVoc
+from datasets.voc_tfds.libs import prep_voc_data, VOC_CLS_MAP
+from datasets.voc_tfds.eval.prepare_eval import get_gts_all
 from configs import cfg, ProjectPath
 
 
@@ -37,27 +37,27 @@ flags.DEFINE_integer('val_sample_num', default=cfg.val_sample_num, help='Validat
 # Save some gpu errors
 physical_devices = tf.config.list_physical_devices('GPU')
 tf.config.experimental.set_memory_growth(device=physical_devices[0], enable=True)
-VOC2012_PB_DIR = os.path.join(ProjectPath.VOC2012_CKPTS_DIR.value, f'yolo_voc2012_{cfg.input_height}x{cfg.input_width}')
+VOC_PB_DIR = os.path.join(ProjectPath.VOC_CKPTS_DIR.value, f'yolo_voc_{cfg.input_height}x{cfg.input_width}')
     
 
 def main(argv):
-    global voc2012, voc2012_val_gts_all, cls_name_list
+    global voc, voc_val_gts_all, cls_name_list
     global logger, tb_train_writer, tb_val_writer, train_viz_batch_data, val_viz_batch_data
     global yolo, optimizer
-    global VOC2012_PB_DIR, ckpt, ckpt_manager
+    global VOC_PB_DIR, ckpt, ckpt_manager
     global val_metrics
 
-    # Dataset (PascalVOC2012)
-    voc2012 = GetVoc2012(batch_size=FLAGS.batch_size)
-    voc2012_val_gts_all_path = os.path.join(ProjectPath.DATASETS_DIR.value, 'voc2012_tfds', 'eval', 'val_gts_all_448_full.pickle')
+    # Dataset (PascalVOC)
+    voc = GetVoc(batch_size=FLAGS.batch_size)
+    voc_val_gts_all_path = os.path.join(ProjectPath.DATASETS_DIR.value, 'voc_tfds', 'eval', 'val_gts_all_448_full.pickle')
     if FLAGS.val_sample_num == 0:
-        if os.path.exists(voc2012_val_gts_all_path):
-            voc2012_val_gts_all = pickle.load(open(voc2012_val_gts_all_path, 'rb'))
+        if os.path.exists(voc_val_gts_all_path):
+            voc_val_gts_all = pickle.load(open(voc_val_gts_all_path, 'rb'))
             cls_name_list = list(VOC_CLS_MAP.values())
         else:
-            voc2012_val_gts_all, cls_name_list = get_gts_all(voc2012.get_val_ds(), cfg.input_height, cfg.input_width, VOC_CLS_MAP, full_save=True)
+            voc_val_gts_all, cls_name_list = get_gts_all(voc.get_val_ds(), cfg.input_height, cfg.input_width, VOC_CLS_MAP, full_save=True)
     else:
-        voc2012_val_gts_all, cls_name_list = get_gts_all(voc2012.get_val_ds().take(FLAGS.val_sample_num), cfg.input_height, cfg.input_width, VOC_CLS_MAP)
+        voc_val_gts_all, cls_name_list = get_gts_all(voc.get_val_ds().take(FLAGS.val_sample_num), cfg.input_height, cfg.input_width, VOC_CLS_MAP)
         
     # Logger
     logger = get_logger()
@@ -66,8 +66,8 @@ def main(argv):
     # Tensorboard
     tb_train_writer = tf.summary.create_file_writer(ProjectPath.TB_LOGS_TRAIN_DIR.value)
     tb_val_writer = tf.summary.create_file_writer(ProjectPath.TB_LOGS_VAL_DIR.value)
-    train_viz_batch_data = next(iter(voc2012.get_train_ds(shuffle=False, drop_remainder=False).take(1)))
-    val_viz_batch_data = next(iter(voc2012.get_val_ds().take(1)))
+    train_viz_batch_data = next(iter(voc.get_train_ds(shuffle=False, drop_remainder=False).take(1)))
+    val_viz_batch_data = next(iter(voc.get_val_ds().take(1)))
     
     # Prediction Visualization (Tensorboard)
     tb_write_sampled_voc_gt_imgs(
@@ -105,11 +105,11 @@ def main(argv):
     ckpt = tf.train.Checkpoint(step=tf.Variable(0), model=yolo)
     ckpt_manager = tf.train.CheckpointManager(
         ckpt,
-        directory=ProjectPath.VOC2012_CKPTS_DIR.value,
+        directory=ProjectPath.VOC_CKPTS_DIR.value,
         max_to_keep=5
     )
 
-    latest_ckpt = tf.train.latest_checkpoint(checkpoint_dir=ProjectPath.VOC2012_CKPTS_DIR.value)
+    latest_ckpt = tf.train.latest_checkpoint(checkpoint_dir=ProjectPath.VOC_CKPTS_DIR.value)
     latest_ckpt_log = '\n' + '=' * 60 + '\n'
     if latest_ckpt:
         ckpt.restore(latest_ckpt)
@@ -129,7 +129,7 @@ def main(argv):
     
 def train():
     for epoch in range(1, FLAGS.epochs+1):
-        train_ds = voc2012.get_train_ds(shuffle=True, drop_remainder=True)
+        train_ds = voc.get_train_ds(shuffle=True, drop_remainder=True)
         steps_per_epoch = len(train_ds)
         train_log_handler = TrainLogHandler(total_epochs=FLAGS.epochs, steps_per_epoch=steps_per_epoch, optimizer=optimizer, logger=logger)
 
@@ -144,9 +144,9 @@ def train():
     
 def validation(epoch):
     if FLAGS.val_sample_num:
-        val_ds = voc2012.get_val_ds().take(FLAGS.val_sample_num)
+        val_ds = voc.get_val_ds().take(FLAGS.val_sample_num)
     else:
-        val_ds = voc2012.get_val_ds()
+        val_ds = voc.get_val_ds()
     val_log_handler = ValLogHandler(total_epochs=FLAGS.epochs, logger=logger)
     val_losses_raw = {
         'total_loss': tf.keras.metrics.MeanTensor(),
@@ -198,7 +198,7 @@ def validation(epoch):
                 val_preds_all.append([cls_name, conf, *map(round, pts), img_id])
             img_id += 1
     
-    APs = get_ap(preds_all=val_preds_all, gts_all=voc2012_val_gts_all, classes=cls_name_list, iou_thr=0.5)
+    APs = get_ap(preds_all=val_preds_all, gts_all=voc_val_gts_all, classes=cls_name_list, iou_thr=0.5)
     val_losses = dict()
     for loss_name in val_losses_raw:
         val_losses[loss_name] = val_losses_raw[loss_name].result().numpy()
@@ -247,10 +247,10 @@ def validation(epoch):
     # Save checkpoint and pb
     if APs['mAP'] >= val_metrics['mAP_best']:
         ckpt_manager.save(checkpoint_number=ckpt.step)
-        yolo.save(filepath=VOC2012_PB_DIR, save_format='tf')
+        yolo.save(filepath=VOC_PB_DIR, save_format='tf')
         val_metrics['mAP_best'] = APs['mAP']
         ckpt_log = '\n' + '=' * 100 + '\n'
-        ckpt_log += f'* Save checkpoint file and pb file [{VOC2012_PB_DIR}]'
+        ckpt_log += f'* Save checkpoint file and pb file [{VOC_PB_DIR}]'
         ckpt_log += '\n' + '=' * 100 + '\n'
         logger.info(ckpt_log)
         print(colored(ckpt_log, 'green'))

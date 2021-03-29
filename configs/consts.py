@@ -12,7 +12,7 @@ class ProjectPath(enum.Enum):
     DATASETS_DIR = os.path.join(ROOT_DIR, 'datasets')
 
     CKPTS_DIR = os.path.join(ROOT_DIR, 'ckpts')
-    VOC2012_CKPTS_DIR = os.path.join(CKPTS_DIR, 'voc2012_ckpts')
+    VOC_CKPTS_DIR = os.path.join(CKPTS_DIR, 'voc_ckpts')
 
     LOGS_DIR = os.path.join(ROOT_DIR, 'logs')
     CONSOLE_LOGS_DIR = os.path.join(LOGS_DIR, 'console_logs')
