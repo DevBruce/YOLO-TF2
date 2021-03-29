@@ -21,13 +21,14 @@ class GetVoc:
             voc2007_info.splits['validation'].num_examples + \
             voc2012_info.splits['train'].num_examples + \
             voc2012_info.splits['validation'].num_examples
+
+        if shuffle:
+            train_ds = train_ds.shuffle(train_ds_num_examples)
         
         train_ds = train_ds.map(normalize_img, num_parallel_calls=self.autotune)
         train_ds = train_ds.map(flip_lr, num_parallel_calls=self.autotune)
         train_ds = train_ds.map(color_augs, num_parallel_calls=self.autotune)
         train_ds = train_ds.cache()  # Loaded data first time, it's going to keep track of some of them in memory. It makes faster
-        if shuffle:
-            train_ds = train_ds.shuffle(train_ds_num_examples)
         train_ds = train_ds.padded_batch(self.batch_size, drop_remainder=drop_remainder)
         train_ds = train_ds.prefetch(self.autotune)  # While running on gpu, it's going to prefetch number of batch_size examples, so they are ready to be run instantly after the gpu calls are done
         return train_ds
