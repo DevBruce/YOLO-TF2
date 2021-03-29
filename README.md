@@ -1,4 +1,4 @@
-# YOLO with Tensorflow 2
+# YOLOv1 with Tensorflow 2
 
 ![tf-v2.4.1](https://img.shields.io/badge/TensorFlow-v2.4.1-orange)
 
@@ -40,9 +40,9 @@ $ docker run -d -it --gpus all --shm-size=${PROPER_VALUE} ${NAME}:${TAG} /bin/ba
 
 <br><br>
 
-## Training Pascal VOC Dataset
+## Pascal VOC Dataset ([Link](http://host.robots.ox.ac.uk/pascal/VOC/))
 
-> Pascal VOC Dataset with [TFDS](https://www.tensorflow.org/datasets/overview) (Training Script: [./voc_scripts/train_voc.py](./voc_scripts/train_voc.py))
+> Pascal VOC Dataset with [TFDS](https://www.tensorflow.org/datasets/overview)
 
 ### Number of Images
 
@@ -57,6 +57,8 @@ $ docker run -d -it --gpus all --shm-size=${PROPER_VALUE} ${NAME}:${TAG} /bin/ba
 <br>
 
 ### Training Script
+
+> Path: [./voc_scripts/train_voc.py](./voc_scripts/train_voc.py)
 
 ```bash
 $ python train_voc.py
@@ -75,6 +77,23 @@ If the options are given, the default config values are overridden.
 - `--val_step`: Validation interval during training
 - `--tb_img_max_outputs `: Number of visualized prediction images in tensorboard
 - `--val_sample_num`: Validation sampling. 0 means use all validation set.
+
+<br>
+
+### Evaluation Script
+
+> Path: [./voc_scripts/eval_voc.py](./voc_scripts/eval_voc.py)
+
+Evaluation pretrained model with VOC2007 Test Dataset
+
+```bash
+$ python eval_voc.py
+```
+
+**Options**  
+
+- `--batch_size`: Evaluation batch size (Default: batch_size of [./configs/configs.py](./configs/configs.py).)
+- `--pb_dir`: Save pb directory path (Default: `./ckpts/voc_ckpts/yolo_voc_448x448`)
 
 <br><br>
 
