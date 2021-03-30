@@ -30,8 +30,8 @@ flags.DEFINE_integer('lr_decay_steps', default=cfg.lr_decay_steps, help='Learnin
 flags.DEFINE_integer('batch_size', default=cfg.batch_size, help='Batch size')
 flags.DEFINE_integer('val_step', default=cfg.val_step, help='Validation interval during training')
 flags.DEFINE_integer('tb_img_max_outputs', default=cfg.tb_img_max_outputs, help='Number of visualized prediction images in tensorboard')
-flags.DEFINE_integer('train_ds_sample_ratio', default=cfg.train_ds_sample_ratio, help='Training dataset sampling ratio')
-flags.DEFINE_integer('val_ds_sample_ratio', default=cfg.val_ds_sample_ratio, help='Validation dataset sampling ratio')
+flags.DEFINE_float('train_ds_sample_ratio', default=cfg.train_ds_sample_ratio, help='Training dataset sampling ratio')
+flags.DEFINE_float('val_ds_sample_ratio', default=cfg.val_ds_sample_ratio, help='Validation dataset sampling ratio')
 # flags.mark_flag_as_required('')
 
 

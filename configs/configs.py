@@ -33,4 +33,4 @@ class Configs:
 
         # Dataset sampling
         self.train_ds_sample_ratio = 0.8  # Prevent out of memory
-        self.val_ds_sample_ratio = 1      # Use all validation set
+        self.val_ds_sample_ratio = 1.     # Use all validation set
