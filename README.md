@@ -5,14 +5,13 @@
 For ease of implementation, i have not implemented exactly the same as paper.  
 The things presented below are implemented differently from the paper.
 
-- Backbone network. (I used **Xception** instead of network mentioned in the paper.)
+- Backbone network. (Used **Xception** instead of network mentioned in the paper.)
 
-- Learning Rate Schedule  
-(I used `tf.keras.optimizers.schedules.ExponentialDecay`)
+- Learning rate schedule (Used `tf.keras.optimizers.schedules.ExponentialDecay`)
 
-- Hyper Parameters
+- Data augmentations (Used lr flip, color shifting)
 
-- Data Augmentations
+- Hyper parameters
 
 - And so on . . .
 
