@@ -31,5 +31,6 @@ class Configs:
         self.nms_iou_thr = 0.5
         self.conf_thr = 0.5  # Used visualization
 
+        # Dataset sampling
         self.train_ds_sample_ratio = 0.8  # Prevent out of memory
-        self.val_sample_num = 0  # Use all validation set
+        self.val_ds_sample_ratio = 1      # Use all validation set

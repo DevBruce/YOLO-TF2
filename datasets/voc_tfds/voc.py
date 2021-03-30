@@ -40,8 +40,10 @@ class GetVoc:
         # train_ds = train_ds.prefetch(self.autotune)  
         return train_ds
 
-    def get_val_ds(self):
-        (val_ds,) = tfds.load(name='voc/2007', split=['test'], with_info=False)
+    def get_val_ds(self, sample_ratio=1):
+        (val_ds,), ds_info = tfds.load(name='voc/2007', split=['test'], with_info=True)
+        if sample_ratio != 1:
+            val_ds = val_ds.take(int(ds_info.splits['test'].num_examples * sample_ratio))
         val_ds = val_ds.map(normalize_img, num_parallel_calls=self.autotune)
         val_ds = val_ds.padded_batch(self.batch_size)
         # val_ds = val_ds.prefetch(self.autotune)

@@ -31,7 +31,7 @@ flags.DEFINE_integer('batch_size', default=cfg.batch_size, help='Batch size')
 flags.DEFINE_integer('val_step', default=cfg.val_step, help='Validation interval during training')
 flags.DEFINE_integer('tb_img_max_outputs', default=cfg.tb_img_max_outputs, help='Number of visualized prediction images in tensorboard')
 flags.DEFINE_integer('train_ds_sample_ratio', default=cfg.train_ds_sample_ratio, help='Training dataset sampling ratio')
-flags.DEFINE_integer('val_sample_num', default=cfg.val_sample_num, help='Validation sampling. 0 means use all validation set')
+flags.DEFINE_integer('val_ds_sample_ratio', default=cfg.val_ds_sample_ratio, help='Validation dataset sampling ratio')
 # flags.mark_flag_as_required('')
 
 
@@ -51,14 +51,14 @@ def main(argv):
     # Dataset (PascalVOC)
     voc = GetVoc(batch_size=FLAGS.batch_size)
     voc_val_gts_all_path = os.path.join(ProjectPath.DATASETS_DIR.value, 'voc_tfds', 'eval', 'val_gts_all_448_full.pickle')
-    if FLAGS.val_sample_num == 0:
+    if FLAGS.val_ds_sample_ratio == 1:
         if os.path.exists(voc_val_gts_all_path):
             voc_val_gts_all = pickle.load(open(voc_val_gts_all_path, 'rb'))
             cls_name_list = list(VOC_CLS_MAP.values())
         else:
             voc_val_gts_all, cls_name_list = get_gts_all(voc.get_val_ds(), cfg.input_height, cfg.input_width, VOC_CLS_MAP, full_save=True)
     else:
-        voc_val_gts_all, cls_name_list = get_gts_all(voc.get_val_ds().take(FLAGS.val_sample_num), cfg.input_height, cfg.input_width, VOC_CLS_MAP)
+        voc_val_gts_all, cls_name_list = get_gts_all(voc.get_val_ds(sample_ratio=FLAGS.val_ds_sample_ratio), cfg.input_height, cfg.input_width, VOC_CLS_MAP)
         
     # Logger
     logger = get_logger()
@@ -144,10 +144,7 @@ def train():
     
     
 def validation(epoch):
-    if FLAGS.val_sample_num:
-        val_ds = voc.get_val_ds().take(FLAGS.val_sample_num)
-    else:
-        val_ds = voc.get_val_ds()
+    val_ds = voc.get_val_ds(sample_ratio=FLAGS.val_ds_sample_ratio)
     val_log_handler = ValLogHandler(total_epochs=FLAGS.epochs, logger=logger)
     val_losses_raw = {
         'total_loss': tf.keras.metrics.MeanTensor(),
