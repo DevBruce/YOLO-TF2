@@ -33,6 +33,6 @@ def color_augs(data):
     imgs = tf.image.random_saturation(imgs, 0.8, 1.2)
     imgs = tf.image.random_brightness(imgs, 0.2)
     imgs = tf.image.random_contrast(imgs, 0.8, 1.2)
-    imgs = tf.clip_by_value(imgs, 0., 1.)
+    imgs = tf.clip_by_value(imgs, 1e-6., 1.)
     data['imgs'] = imgs
     return data
