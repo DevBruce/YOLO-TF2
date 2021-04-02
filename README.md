@@ -9,7 +9,7 @@ The things presented below are implemented differently from the paper.
 
 - Learning rate schedule (Used `tf.keras.optimizers.schedules.ExponentialDecay`)
 
-- Data augmentations (Used lr flip, color shifting)
+- Data augmentations
 
 - Hyper parameters
 
