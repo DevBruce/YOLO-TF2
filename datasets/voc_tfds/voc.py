@@ -1,6 +1,5 @@
 import tensorflow as tf
 import tensorflow_datasets as tfds
-from .augs import normalize_img, flip_lr, color_augs
 
 
 __all__ = ['GetVoc']
@@ -27,15 +26,9 @@ class GetVoc:
         if sample_ratio != 1.:
             train_ds = train_ds.take(int(train_ds_num_examples * sample_ratio))
         
-        train_ds = train_ds.map(normalize_img, num_parallel_calls=self.autotune)
-        train_ds = train_ds.map(flip_lr, num_parallel_calls=self.autotune)
-        train_ds = train_ds.map(color_augs, num_parallel_calls=self.autotune)
-        
         # Loaded data first time, it's going to keep track of some of them in memory. It makes faster
         # train_ds = train_ds.cache()
-        
         train_ds = train_ds.padded_batch(self.batch_size, drop_remainder=drop_remainder)
-        
         # While running on gpu, it's going to prefetch number of batch_size examples, so they are ready to be run instantly after the gpu calls are done
         # train_ds = train_ds.prefetch(self.autotune)  
         return train_ds
@@ -44,7 +37,6 @@ class GetVoc:
         (val_ds,), ds_info = tfds.load(name='voc/2007', split=['test'], with_info=True)
         if sample_ratio != 1.:
             val_ds = val_ds.take(int(ds_info.splits['test'].num_examples * sample_ratio))
-        val_ds = val_ds.map(normalize_img, num_parallel_calls=self.autotune)
         val_ds = val_ds.padded_batch(self.batch_size)
         # val_ds = val_ds.prefetch(self.autotune)
         return val_ds

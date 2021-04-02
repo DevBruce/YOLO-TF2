@@ -135,7 +135,7 @@ def train():
         train_log_handler = TrainLogHandler(total_epochs=FLAGS.epochs, steps_per_epoch=steps_per_epoch, optimizer=optimizer, logger=logger)
 
         for step, batch_data in enumerate(train_ds, 1):
-            batch_imgs, batch_labels = prep_voc_data(batch_data, input_height=cfg.input_height, input_width=cfg.input_width)
+            batch_imgs, batch_labels = prep_voc_data(batch_data, input_height=cfg.input_height, input_width=cfg.input_width, val=False)
             losses = train_step(yolo, optimizer, batch_imgs, batch_labels, cfg)
             train_log_handler.logging(epoch=epoch, step=step, losses=losses, tb_writer=tb_train_writer)
 
@@ -158,7 +158,7 @@ def validation(epoch):
     val_preds_all = list()
 
     for step, batch_data in tqdm.tqdm(enumerate(val_ds, 1), total=len(val_ds), desc='Validation'):
-        batch_imgs, batch_labels = prep_voc_data(batch_data, input_height=cfg.input_height, input_width=cfg.input_width)
+        batch_imgs, batch_labels = prep_voc_data(batch_data, input_height=cfg.input_height, input_width=cfg.input_width, val=True)
         yolo_output_raw = yolo(batch_imgs)
 
         # ====== ====== ====== Calc Losses ====== ====== ======
@@ -206,7 +206,7 @@ def validation(epoch):
 
     # ========= Tensorboard Image: prediction output visualization =========
     # Training data output visualization
-    sampled_voc_imgs, _ = prep_voc_data(train_viz_batch_data, input_height=cfg.input_height, input_width=cfg.input_width)
+    sampled_voc_imgs, _ = prep_voc_data(train_viz_batch_data, input_height=cfg.input_height, input_width=cfg.input_width, val=True)
     sampled_voc_preds = yolo(sampled_voc_imgs)
     sampled_voc_output_boxes = yolo_output2boxes(sampled_voc_preds, cfg.input_height, cfg.input_width, cfg.cell_size, cfg.boxes_per_cell)
     sampled_imgs_num = FLAGS.tb_img_max_outputs if len(sampled_voc_imgs) > FLAGS.tb_img_max_outputs else len(sampled_voc_imgs)
@@ -224,7 +224,7 @@ def validation(epoch):
     )
 
     # Validation data output visualization
-    sampled_voc_imgs, _ = prep_voc_data(val_viz_batch_data, input_height=cfg.input_height, input_width=cfg.input_width)
+    sampled_voc_imgs, _ = prep_voc_data(val_viz_batch_data, input_height=cfg.input_height, input_width=cfg.input_width, val=True)
     sampled_voc_preds = yolo(sampled_voc_imgs)
     sampled_voc_output_boxes = yolo_output2boxes(sampled_voc_preds, cfg.input_height, cfg.input_width, cfg.cell_size, cfg.boxes_per_cell)
     sampled_imgs_num = FLAGS.tb_img_max_outputs if len(sampled_voc_imgs) > FLAGS.tb_img_max_outputs else len(sampled_voc_imgs)

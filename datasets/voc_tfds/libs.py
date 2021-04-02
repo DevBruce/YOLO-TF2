@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import tensorflow as tf
+from .augs import get_transform
 
 
 __all__ = ['VOC_CLS_MAP', 'trim_img_zero_pad', 'prep_voc_data']
@@ -36,42 +37,54 @@ def trim_img_zero_pad(arr):
     return arr[mesh]
 
 
-def prep_voc_data(batch_data, input_height, input_width):
-    """
-    Returns:
-      tuple: (batch_imgs, batch_labels)
-        batch_imgs (EagerTensor dtype=tf.float32)
-        batch_labels (EagerTensor dtype=tf.float32 in list)-> [center_x, center_y, width, height, cls_idx] (Relative coordinates)
-    """
-    imgs, labels = batch_data['imgs'].numpy(), batch_data['labels']
-    num_batch = len(imgs)
-    batch_labels = list()
-    batch_imgs = np.empty((num_batch, input_height, input_width, 3), dtype=np.float32)
-    for i in range(num_batch):
-        # Image resize
-        origin_size_img = trim_img_zero_pad(imgs[i])
-        img_resized = cv2.resize(origin_size_img, dsize=(input_height, input_width))
-        batch_imgs[i] = img_resized
+def prep_voc_data(batch_data, input_height, input_width, val=False):
+    batch_images = batch_data['image'].numpy()
+    batch_bboxes = batch_data['objects']['bbox'].numpy()
+    batch_class_indices = batch_data['objects']['label'].numpy()
+
+    batch_images_prep = np.empty((0, input_height, input_width, 3), dtype=np.float32)
+    batch_label_list = list()
+    for i in range(n_batch):
+        # Image preprocessing
+        padded_img = batch_images[i]
+        img = trim_img_zero_pad(padded_img).astype(np.float32) / 255.
+        img_height, img_width, _ = img.shape
+
+        # Box coordinates preprocessing
+        bboxes = batch_bboxes[i].astype(np.float32)
+        zero_pad_filter = np.any(bboxes, axis=1)
+        bboxes = bboxes[zero_pad_filter]
+
+        y_min, x_min, y_max, x_max = bboxes[:, 0], bboxes[:, 1], bboxes[:, 2], bboxes[:, 3]
+        bboxes = np.array([x_min, y_min, x_max, y_max], dtype=np.float32).T
+
+        # Class Indices preprocessing
+        class_indices = batch_class_indices[i].astype(np.float32)
+        class_indices = class_indices[zero_pad_filter]
+
+        # Augmentation
+        transform = get_transform(img_height, img_width, input_height=input_height, input_width=input_width, val=val)
+        transformed = transform(image=img, bboxes=bboxes, class_indices=class_indices)
+        transformed_image = transformed['image']
+        transformed_bboxes = np.array(transformed['bboxes'], dtype=np.float32)
+        transformed_class_indices = np.array(transformed['class_indices'], dtype=np.float32)
+
+        if transformed_bboxes.size == 0:
+            continue
+
+        # Convert box coordinates [x_min, y_min, x_max, y_max] to [cx, cy, w, h]
+        x_min, y_min = transformed_bboxes[:, 0], transformed_bboxes[:, 1]
+        x_max, y_max = transformed_bboxes[:, 2], transformed_bboxes[:, 3]
+        cx, cy = (x_min + x_max) / 2, (y_min + y_max) / 2
+        w, h = (x_max - x_min), (y_max - y_min)
+        transformed_labels = np.array([cx, cy, w, h, transformed_class_indices], dtype=np.float32).T
+        transformed_labels = tf.convert_to_tensor(transformed_labels, dtype=tf.float32)
+
+        # Append result
+        batch_label_list.append(transformed_labels)
+        transformed_image = np.expand_dims(transformed_image, axis=0)
+        batch_images_prep = np.vstack([batch_images_prep, transformed_image])
         
-        # Class Indices
-        cls_idx = labels['label'][i].numpy()
-        
-        # Sync coordinates with resized image
-        origin_height, origin_width, _ = origin_size_img.shape
-        
-        pts = labels['bbox'][i].numpy()
-        y_min_rel, x_min_rel = pts[:, 0], pts[:, 1]
-        y_max_rel, x_max_rel = pts[:, 2], pts[:, 3]
-        
-        cx_rel = (x_min_rel + x_max_rel) / 2
-        cy_rel = (y_min_rel + y_max_rel) / 2
-        w_rel = (x_max_rel - x_min_rel)
-        h_rel = (y_max_rel - y_min_rel)
-        
-        label_preps = np.array([cx_rel, cy_rel, w_rel, h_rel, cls_idx], dtype=np.float32).T
-        label_preps = label_preps[np.where(np.any(label_preps[:, :4], axis=1) == True)]  # Filter dummy data by padded batch
-        label_preps = tf.convert_to_tensor(label_preps, dtype=tf.float32)
-        batch_labels.append(label_preps)
-        
-    batch_imgs = tf.convert_to_tensor(batch_imgs, dtype=tf.float32)
-    return batch_imgs, batch_labels
+    batch_images_prep = tf.convert_to_tensor(batch_images_prep, dtype=tf.float32)
+    return batch_images_prep, batch_label_list
+    
