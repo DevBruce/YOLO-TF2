@@ -44,7 +44,7 @@ def prep_voc_data(batch_data, input_height, input_width, val=False):
 
     batch_images_prep = np.empty((0, input_height, input_width, 3), dtype=np.float32)
     batch_label_list = list()
-    for i in range(n_batch):
+    for i in range(len(batch_images)):
         # Image preprocessing
         padded_img = batch_images[i]
         img = trim_img_zero_pad(padded_img).astype(np.float32) / 255.

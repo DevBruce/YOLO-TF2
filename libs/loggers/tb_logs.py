@@ -36,7 +36,7 @@ def tb_write_imgs(tb_writer, name, imgs, step, max_outputs):
 
 def tb_write_sampled_voc_gt_imgs(batch_data, input_height, input_width, tb_writer, name, max_outputs):
     viz_img_list = list()
-    for idx in range(len(batch_data['imgs'])):
+    for idx in range(len(batch_data['image'])):
         viz_img = viz_voc_prep(
             batch_data,
             idx,

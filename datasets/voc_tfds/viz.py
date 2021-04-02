@@ -7,14 +7,17 @@ __all__ = ['viz_voc_origin', 'viz_voc_prep']
 
 
 def viz_voc_origin(batch_data, idx, box_color=(0, 255, 0), thickness=1, txt_color=(255, 0, 0)):
-    imgs, labels = batch_data['imgs'].numpy(), batch_data['labels']
-    img = imgs[idx].copy()
+    batch_images = batch_data['image'].numpy()
+    batch_bboxes = batch_data['objects']['bbox'].numpy()
+    batch_class_indices = batch_data['objects']['label'].numpy()
+
+    img = batch_images[idx].copy()
     img = (img * 255).astype(np.uint8)
     img_no_pad = trim_img_zero_pad(img)
     height, width, _ = img_no_pad.shape
 
-    cls_idxs = labels['label'][idx].numpy()
-    pts_rel = labels['bbox'][idx].numpy()
+    cls_idxs = batch_class_indices[idx]
+    pts_rel = batch_bboxes[idx]
     y_min, x_min = pts_rel[:, 0] * height, pts_rel[:, 1] * width
     y_max, x_max = pts_rel[:, 2] * height, pts_rel[:, 3] * width
     pts_abs = np.array([x_min, y_min, x_max, y_max, cls_idxs], dtype=np.float32).T
