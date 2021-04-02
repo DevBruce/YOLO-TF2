@@ -31,8 +31,8 @@ def viz_voc_origin(batch_data, idx, box_color=(0, 255, 0), thickness=1, txt_colo
     return img_no_pad
 
 
-def viz_voc_prep(batch_data, idx, input_height, input_width, box_color=(0, 255, 0), thickness=1, txt_color=(255, 0, 0)):
-    imgs, labels = prep_voc_data(batch_data, input_height, input_width)
+def viz_voc_prep(batch_data, idx, input_height, input_width, val, box_color=(0, 255, 0), thickness=1, txt_color=(255, 0, 0)):
+    imgs, labels = prep_voc_data(batch_data, input_height, input_width, val=val)
     img = imgs[idx].numpy().copy()
     img = (img * 255).astype(np.uint8)
     label = labels[idx].numpy()

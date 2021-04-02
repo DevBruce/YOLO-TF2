@@ -37,7 +37,7 @@ def trim_img_zero_pad(arr):
     return arr[mesh]
 
 
-def prep_voc_data(batch_data, input_height, input_width, val=False):
+def prep_voc_data(batch_data, input_height, input_width, val):
     batch_images = batch_data['image'].numpy()
     batch_bboxes = batch_data['objects']['bbox'].numpy()
     batch_class_indices = batch_data['objects']['label'].numpy()

@@ -15,5 +15,5 @@ RUN pip install tensorflow-datasets
 RUN pip install albumentations
 RUN pip install pascalvoc-ap
 RUN pip install jupyterlab
-COPY . /YOLO_TF2
-WORKDIR /YOLO_TF2
+COPY . /YOLOv1_TF2
+WORKDIR /YOLOv1_TF2

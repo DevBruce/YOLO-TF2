@@ -34,7 +34,7 @@ def tb_write_imgs(tb_writer, name, imgs, step, max_outputs):
         tf.summary.image(name, imgs, step=step, max_outputs=max_outputs)
 
 
-def tb_write_sampled_voc_gt_imgs(batch_data, input_height, input_width, tb_writer, name, max_outputs):
+def tb_write_sampled_voc_gt_imgs(batch_data, input_height, input_width, tb_writer, name, max_outputs, val):
     viz_img_list = list()
     for idx in range(len(batch_data['image'])):
         viz_img = viz_voc_prep(
@@ -42,6 +42,7 @@ def tb_write_sampled_voc_gt_imgs(batch_data, input_height, input_width, tb_write
             idx,
             input_height=input_height,
             input_width=input_width,
+            val=val,
             box_color=(0, 255, 0),
             thickness=1,
             txt_color=(255, 0, 0),

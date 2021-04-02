@@ -72,19 +72,21 @@ def main(argv):
     
     # Prediction Visualization (Tensorboard)
     tb_write_sampled_voc_gt_imgs(
-        batch_data=val_viz_batch_data,
-        input_height=cfg.input_height,
-        input_width=cfg.input_width,
-        tb_writer=tb_val_writer,
-        name='[Val] GT',
-        max_outputs=FLAGS.tb_img_max_outputs,
-    )
-    tb_write_sampled_voc_gt_imgs(
         batch_data=train_viz_batch_data,
         input_height=cfg.input_height,
         input_width=cfg.input_width,
+        val=True,
         tb_writer=tb_train_writer,
         name='[Train] GT',
+        max_outputs=FLAGS.tb_img_max_outputs,
+    )
+    tb_write_sampled_voc_gt_imgs(
+        batch_data=val_viz_batch_data,
+        input_height=cfg.input_height,
+        input_width=cfg.input_width,
+        val=True,
+        tb_writer=tb_val_writer,
+        name='[Val] GT',
         max_outputs=FLAGS.tb_img_max_outputs,
     )
 
