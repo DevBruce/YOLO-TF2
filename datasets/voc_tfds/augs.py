@@ -1,38 +1,28 @@
-import random
-import tensorflow as tf
+import numpy as np
+import albumentations as A
 
 
-__all__ = ['normalize_img', 'flip_lr', 'color_augs']
+__all__ = ['get_transform']
 
 
-def normalize_img(data):
-    imgs_normalized = tf.cast(data['image'], dtype=tf.float32) / 255.0
-    ret = {
-        'imgs': imgs_normalized,
-        'labels': data['objects']
-    }
-    return ret
+def get_transform(img_height, img_width, input_height, input_width):
+    h_crop_ratio = np.random.uniform(low=0.4, high=0.8)
+    w_crop_ratio = np.random.uniform(low=0.4, high=0.8)
+    h_crop = int(img_height * h_crop_ratio)
+    w_crop = int(img_width * w_crop_ratio)
 
-
-def flip_lr(data):
-    if random.choice([True, False]):
-        img_lr_flipped = data['imgs'][:, ::-1, :]
-        pts = data['labels']['bbox']
-        y_min_rel, x_min_rel, y_max_rel, x_max_rel = pts[:, 0], pts[:, 1], pts[:, 2], pts[:, 3]
-        w_rel = x_max_rel - x_min_rel
-        x_min_rel_flipped, x_max_rel_flipped = 1. - x_min_rel, 1. - x_max_rel
-        pts_lr_flipped = tf.transpose(tf.stack([y_min_rel, x_min_rel_flipped - w_rel, y_max_rel, x_max_rel_flipped + w_rel]))
-        data['imgs'] = img_lr_flipped
-        data['labels']['bbox'] = pts_lr_flipped
-    return data
-
-
-def color_augs(data):
-    imgs = data['imgs']
-    imgs = tf.image.random_hue(imgs, 0.08)
-    imgs = tf.image.random_saturation(imgs, 0.8, 1.2)
-    imgs = tf.image.random_brightness(imgs, 0.2)
-    imgs = tf.image.random_contrast(imgs, 0.8, 1.2)
-    imgs = tf.clip_by_value(imgs, 1e-6., 1.)
-    data['imgs'] = imgs
-    return data
+    transform = A.Compose(
+        [
+            A.HorizontalFlip(p=0.5),
+            A.RandomCrop(width=w_crop, height=h_crop, p=0.5),
+            A.HueSaturationValue(hue_shift_limit=0.2, sat_shift_limit=0.2, val_shift_limit=0.2, p=0.5),
+            A.RandomBrightnessContrast(p=0.2),
+            A.Resize(input_height, input_width, p=1.),
+        ],
+        bbox_params=A.BboxParams(
+            format='albumentations',
+            min_visibility=0.2,
+            label_fields=['class_indices'],
+        ),
+    )
+    return transform
