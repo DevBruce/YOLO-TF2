@@ -12,6 +12,7 @@ RUN pip install --upgrade pip
 RUN pip install opencv-python
 RUN pip install matplotlib
 RUN pip install tensorflow-datasets
+RUN pip install albumentations
 RUN pip install pascalvoc-ap
 RUN pip install jupyterlab
 COPY . /YOLO_TF2
