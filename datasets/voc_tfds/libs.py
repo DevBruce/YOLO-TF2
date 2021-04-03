@@ -42,7 +42,7 @@ def prep_voc_data(batch_data, input_height, input_width, val):
     batch_bboxes = batch_data['objects']['bbox'].numpy()
     batch_class_indices = batch_data['objects']['label'].numpy()
 
-    batch_images_prep = np.empty((0, input_height, input_width, 3), dtype=np.float32)
+    batch_images_prep = list()
     batch_label_list = list()
     for i in range(len(batch_images)):
         # Image preprocessing
@@ -81,10 +81,10 @@ def prep_voc_data(batch_data, input_height, input_width, val):
         transformed_labels = tf.convert_to_tensor(transformed_labels, dtype=tf.float32)
 
         # Append result
+        batch_images_prep.append(transformed_image)
         batch_label_list.append(transformed_labels)
-        transformed_image = np.expand_dims(transformed_image, axis=0)
-        batch_images_prep = np.vstack([batch_images_prep, transformed_image])
         
+    batch_images_prep = np.stack(batch_images_prep, axis=0)
     batch_images_prep = tf.convert_to_tensor(batch_images_prep, dtype=tf.float32)
     return batch_images_prep, batch_label_list
     
