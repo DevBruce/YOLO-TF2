@@ -18,8 +18,8 @@ def get_transform(img_height, img_width, input_height, input_width, val=False):
             ),
         )
     else:  # Training --> Augment data
-        h_crop_ratio = np.random.uniform(low=0.4, high=1.)
-        w_crop_ratio = np.random.uniform(low=0.4, high=1.)
+        h_crop_ratio = np.random.uniform(low=0.25, high=1.)
+        w_crop_ratio = np.random.uniform(low=0.25, high=1.)
         h_crop = int(img_height * h_crop_ratio)
         w_crop = int(img_width * w_crop_ratio)
         transform = A.Compose(
