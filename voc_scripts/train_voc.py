@@ -91,7 +91,7 @@ def main(argv):
     )
 
     # Model
-    backbone_xception = get_xception_backbone(cfg=cfg, freeze=False)
+    backbone_xception = get_xception_backbone(input_height=cfg.input_height, input_width=cfg.input_width, freeze=False)
     yolo = YOLO(backbone=backbone_xception, cfg=cfg)
 
     # Optimizer

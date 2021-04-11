@@ -23,11 +23,11 @@ class YOLO(tf.keras.Model):
         return self.model(x)
 
 
-def get_xception_backbone(cfg, freeze=False):
+def get_xception_backbone(input_height, input_width, freeze=False):
     backbone = tf.keras.applications.Xception(
         include_top=False,
         weights='imagenet',
-        input_shape=(448, 448, 3),
+        input_shape=(input_height, input_width, 3),
     )
     backbone.trainable = not freeze
     return backbone
