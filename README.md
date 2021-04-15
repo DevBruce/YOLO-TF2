@@ -39,6 +39,28 @@ The things presented below are implemented differently from the paper.
 </a>
 </div>
 
+<br>
+
+### Inference Visualization
+
+<div align="center">
+<a href="./preview/voc2007_test_sample01_viz.jpeg">
+<img src="./preview/voc2007_test_sample01_viz.jpeg" width="400" height="240">
+</a>
+<a href="./preview/voc2007_test_sample02_viz.jpeg">
+<img src="./preview/voc2007_test_sample02_viz.jpeg" width="400" height="240">
+</a>
+</div>
+
+<div align="center">
+<a href="./preview/voc2007_test_sample03_viz.jpeg">
+<img src="./preview/voc2007_test_sample03_viz.jpeg" width="400" height="240">
+</a>
+<a href="./preview/voc2007_test_sample04_viz.jpeg">
+<img src="./preview/voc2007_test_sample04_viz.jpeg" width="400" height="240">
+</a>
+</div>
+
 <br><br>
 
 ## Build Environment with Docker
