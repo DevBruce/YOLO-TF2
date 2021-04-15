@@ -79,7 +79,7 @@ $ docker run -d -it --gpus all --shm-size=${PROPER_VALUE} ${NAME}:${TAG} /bin/ba
 
 <br><br>
 
-## Pascal VOC Dataset ([Link](http://host.robots.ox.ac.uk/pascal/VOC/))
+## Training Dataset: Pascal VOC Dataset ([Link](http://host.robots.ox.ac.uk/pascal/VOC/))
 
 > Pascal VOC Dataset with [TFDS](https://www.tensorflow.org/datasets/overview)
 
@@ -90,12 +90,12 @@ $ docker run -d -it --gpus all --shm-size=${PROPER_VALUE} ${NAME}:${TAG} /bin/ba
 | Pascal VOC 2007 | 2501  | 2510       | 4952 (Used Validation) |
 | Pascal VOC 2012 | 5717  | 5823       | 10991 (No labels)      |
 
-- Training Set: VOC2007 trainval + VOC2012 trainval
-- Validation Set: VOC2007 test
+- Training Set: VOC2007 trainval + VOC2012 trainval (Total: 16551)
+- Validation Set: VOC2007 test (Total: 4952)
 
 <br>
 
-### Training Script
+## Training Script
 
 > Path: [./voc_scripts/train_voc.py](./voc_scripts/train_voc.py)
 
@@ -120,7 +120,7 @@ If the options are given, the default config values are overridden.
 
 <br>
 
-### Evaluation Script
+## Evaluation Script
 
 > Path: [./voc_scripts/eval_voc.py](./voc_scripts/eval_voc.py)
 
