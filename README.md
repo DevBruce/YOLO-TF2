@@ -19,7 +19,25 @@ The things presented below are implemented differently from the paper.
 
 ## Preview
 
-Will be updated soon . . .
+### Tensorboard
+
+<div align="center">
+<a href="./preview/tb_scalars_val_aps.jpeg">
+<img src="./preview/tb_scalars_val_aps.jpeg" width="400" height="240">
+</a>
+<a href="./preview/tb_scalars_lr_losses.jpeg">
+<img src="./preview/tb_scalars_lr_losses.jpeg" width="400" height="240">
+</a>
+</div>
+
+<div align="center">
+<a href="./preview/tb_imgs_train.jpeg">
+<img src="./preview/tb_imgs_train.jpeg" width="400" height="240">
+</a>
+<a href="./preview/tb_imgs_val.jpeg">
+<img src="./preview/tb_imgs_val.jpeg" width="400" height="240">
+</a>
+</div>
 
 <br><br>
 
