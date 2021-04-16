@@ -46,7 +46,7 @@ def yolo_output2boxes(yolo_model_output_raw, input_height, input_width, cell_siz
     output_boxes = tf.reshape(output_boxes, [-1, cell_size, cell_size, boxes_per_cell, 5])
 
     # Coordinate & Confidence
-    output_boxes_postprocessed = np.empty([len(output_boxes), cell_size, cell_size, boxes_per_cell, 5])
+    output_boxes_postprocessed = np.empty([len(output_boxes), cell_size, cell_size, boxes_per_cell, 5], dtype=np.float32)
     for i in range(len(output_boxes)):
         output_boxes_one = output_boxes[i]
         output_boxes_postp = postprocess_yolo_format(output_boxes_one, input_height, input_width, cell_size, boxes_per_cell).numpy()
@@ -56,6 +56,7 @@ def yolo_output2boxes(yolo_model_output_raw, input_height, input_width, cell_siz
     output_classes = yolo_model_output_raw[:, :, :, boxes_per_cell*5:]
     output_classes_argmax = np.argmax(output_classes, axis=3)
     output_classes_per_boxes = np.tile(output_classes_argmax[:, :, :, np.newaxis, np.newaxis], reps=[1, 1, 1, boxes_per_cell, 1])
+    output_classes_per_boxes = output_classes_per_boxes.astype(np.float32)
 
     # Concatenate [(Coordinate & Confidence), Class]
     output_concat = np.concatenate((output_boxes_postprocessed, output_classes_per_boxes), axis=4)
