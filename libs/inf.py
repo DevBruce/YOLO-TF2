@@ -23,6 +23,7 @@ def get_pred(img, model, nms_iou_thr=0.5, conf_thr=0.5, cfg=cfg):
     yolo_output_raw = model(img)
     yolo_boxes = yolo_output2boxes(yolo_output_raw, cfg.input_height, cfg.input_width, cfg.cell_size, cfg.boxes_per_cell)
     yolo_boxes_postprep = box_postp2use(yolo_boxes[0], nms_iou_thr=nms_iou_thr, conf_thr=conf_thr)
+    yolo_boxes_postprep = np.around(yolo_boxes_postprep).astype(np.int32)
     return yolo_boxes_postprep
 
 
