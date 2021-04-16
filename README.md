@@ -93,7 +93,51 @@ $ docker run -d -it --gpus all --shm-size=${PROPER_VALUE} ${NAME}:${TAG} /bin/ba
 - Training Set: VOC2007 trainval + VOC2012 trainval (Total: 16551)
 - Validation Set: VOC2007 test (Total: 4952)
 
+<br><br>
+
+## Pretrained PB File
+
+Trained with default values of this repo. (Total Epoch: 105)
+
+- **Download pb file: \<[Google Drive Link](https://drive.google.com/file/d/1s-3HXGmlRUhuZ5uiZzxQDGrfOA5Y-5_a/view?usp=sharing)\>**
+
+pb file is uploaded as `tar.gz`. So, you have to decompress this file like below.
+
+```bash
+$ tar -zxvf yolo_voc_448x448.tar.gz
+```
+
+If you want to inference with this pb file, infer to [inference_tutorial.ipynb](./inference_tutorial.ipynb)
+
 <br>
+
+### Performance (Evaluation with VOC2007 test)
+
+| class name  | AP         |
+|-------------|------------|
+| dog         | 0.7464     |
+| pottedplant | 0.2257     |
+| car         | 0.5016     |
+| person      | 0.4481     |
+| tvmonitor   | 0.5213     |
+| diningtable | 0.4573     |
+| bicycle     | 0.5927     |
+| chair       | 0.2041     |
+| motorbike   | 0.5596     |
+| sofa        | 0.4797     |
+| bus         | 0.6215     |
+| boat        | 0.3265     |
+| horse       | 0.7048     |
+| aeroplane   | 0.5872     |
+| sheep       | 0.4223     |
+| bottle      | 0.1311     |
+| train       | 0.7917     |
+| cat         | 0.8046     |
+| bird        | 0.4824     |
+| cow         | 0.4548     |
+| **mAP**     | **0.5032** |
+
+<br><br>
 
 ## Training Script
 
