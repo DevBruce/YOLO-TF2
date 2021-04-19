@@ -11,6 +11,7 @@ def calc_iou(pred_boxes, gt_box, cfg):
       pred_boxes (EagerTensor dtype=tf.float32): 4-D tensor [cell_size, cell_size, boxes_per_cell, 5] ==> [x_min, y_min, x_max, y_max, confidence] (Absolute coordinates)
       gt_box (EagerTensor dtype=tf.float32): 1-D tensor [4] ==> [x_center_rel, y_center_rel, width_rel, height_rel]
       cfg: YOLO config object
+      
     Returns:
       iou (EagerTensor dtype=tf.float32): 3-D tensor [cell_size, cell_size, boxes_per_cell]
     """
